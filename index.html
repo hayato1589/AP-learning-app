@@ -1,0 +1,48 @@
+index.html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>応用情報技術者試験 演習問題</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>応用情報技術者試験 演習問題</h1>
+            <div id="progress">問題 <span id="current-number">1</span> / <span id="total-questions">0</span></div>
+        </header>
+
+        <main id="question-container">
+            <div class="question-header">
+                <span id="category" class="category-tag"></span>
+            </div>
+
+            <div class="question-content">
+                <p id="question-text"></p>
+                
+                <div id="choices-container" class="choices">
+                    <!-- 選択肢がここに動的に追加されます -->
+                </div>
+
+                <div id="result" class="hidden">
+                    <h3 id="judgment"></h3>
+                    <div id="explanation" class="explanation"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="next-button" class="hidden">次の問題へ</button>
+            </div>
+        </main>
+
+        <div id="quiz-end" class="hidden">
+            <h2>お疲れ様でした！</h2>
+            <p>全ての問題が終了しました。</p>
+            <button onclick="resetQuiz()" class="reset-button">最初からやり直す</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
