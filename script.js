@@ -1,14 +1,26 @@
 // 問題データの取得
 let questions = [];
-fetch('./data/questions.json')
-    .then(response => response.json())
-    .then(data => {
-        questions = data;
-        // 合計問題数を表示（最大80問まで）
-        const totalQuestions = Math.min(data.length, 80);
-        document.getElementById('total-questions').textContent = totalQuestions;
-        showQuestion(currentQuestionIndex);
-    });
+let correctAnswers = 0;
+
+// 開始ボタンのイベントリスナー
+document.getElementById('start-button').addEventListener('click', () => {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-container').classList.remove('hidden');
+    startQuiz();
+});
+
+function startQuiz() {
+    fetch('./data/questions.json')
+        .then(response => response.json())
+        .then(data => {
+            // 問題をシャッフル
+            questions = data.sort(() => Math.random() - 0.5);
+            // 合計問題数を表示（最大80問まで）
+            const totalQuestions = Math.min(questions.length, 80);
+            document.getElementById('total-questions').textContent = totalQuestions;
+            showQuestion(currentQuestionIndex);
+        });
+}
 
 // 現在の問題インデックスを管理
 let currentQuestionIndex = 0;
@@ -48,6 +60,7 @@ function checkAnswer(selectedIndex) {
     if (selectedIndex === question.answer) {
         judgmentText.textContent = '正解！';
         judgmentText.className = 'correct';
+        correctAnswers++;
     } else {
         judgmentText.textContent = '不正解...';
         judgmentText.className = 'incorrect';
@@ -70,11 +83,18 @@ document.getElementById('next-button').addEventListener('click', () => {
     currentQuestionIndex++;
     
     if (currentQuestionIndex >= Math.min(questions.length, 80)) {
-        // 全問終了時の処理
-        document.getElementById('question-container').classList.add('hidden');
-        document.getElementById('quiz-end').classList.remove('hidden');
+        showQuizEnd();
     } else {
         showQuestion(currentQuestionIndex);
+    }
+});
+
+// 終了ボタンのイベントリスナー
+document.getElementById('end-button').addEventListener('click', () => {
+    if (confirm('テストを終了しますか？残りの問題は不正解として扱われます。')) {
+        const totalQuestions = Math.min(questions.length, 80);
+        // 残りの問題を不正解として扱う（現在の正解数はそのまま）
+        showQuizEnd();
     }
 });
 
@@ -88,4 +108,16 @@ function resetQuiz() {
     document.getElementById('quiz-end').classList.add('hidden');
     
     showQuestion(currentQuestionIndex);
+}
+
+function showQuizEnd() {
+    const totalQuestions = Math.min(questions.length, 80);
+    const percentage = (correctAnswers / totalQuestions * 100).toFixed(1);
+    const isPassed = percentage >= 60;
+    
+    document.getElementById('question-container').classList.add('hidden');
+    document.getElementById('quiz-end').classList.remove('hidden');
+    document.getElementById('quiz-result').textContent = `${correctAnswers}問中${totalQuestions}問正解（正答率: ${percentage}%）`;
+    document.getElementById('pass-fail').textContent = isPassed ? '合格です！' : '不合格です。';
+    document.getElementById('pass-fail').className = isPassed ? 'pass' : 'fail';
 }
