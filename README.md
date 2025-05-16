@@ -2,6 +2,8 @@
 
 # Exercise Website
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hayato1589/AP-learning-app)
+
 このプロジェクトは、応用情報技術者試験の演習問題を解くことができるウェブアプリケーションです。ユーザーはランダムに出題される選択式問題に解答し、正誤判定や解説、成績表示、復習機能を利用できます。
 
 ## 主な機能
