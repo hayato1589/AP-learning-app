@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>QuizApp Mocha Test</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha/mocha.css" />
+  <style>
+    body { font-family: sans-serif; }
+    #mocha { margin: 2em; }
+  </style>
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="https://cdn.jsdelivr.net/npm/mocha/mocha.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chai/chai.js"></script>
+  <script>mocha.setup('bdd');</script>
+  <!-- 必要なHTML要素のダミーを用意 -->
+  <div id="favorite-count"></div>
+  <button id="favorite-quiz-button" class="hidden"></button>
+  <button id="favorite-list-button" class="hidden"></button>
+  <div id="temp-message" class="hidden"></div>
+  <div id="review-mode-badge" class="hidden"></div>
+  <div id="start-screen"></div>
+  <div id="quiz-container"></div>
+  <div id="total-questions"></div>
+  <div id="current-number"></div>
+  <div id="category"></div>
+  <div id="question-text"></div>
+  <div id="choices-container"></div>
+  <div id="result" class="hidden"></div>
+  <div id="judgment"></div>
+  <div id="explanation"></div>
+  <button id="next-button" class="hidden"></button>
+  <button id="prev-button" class="hidden"></button>
+  <button id="end-button"></button>
+  <button id="review-bookmarks-button" class="hidden"></button>
+  <button id="bookmark-button"></button>
+  <div id="quiz-end" class="hidden"></div>
+  <div id="quiz-end-title"></div>
+  <div id="quiz-end-message"></div>
+  <div id="worst-ranking-area"></div>
+  <div id="reminder-area"></div>
+  <div id="favorite-list-modal" class="hidden"></div>
+  <div id="favorite-list-container"></div>
+  <button id="close-favorite-list"></button>
+  <div id="timer"></div>
+  <span id="timer-seconds"></span>
+  <script src="../quiz-app.js"></script>
+  <script src="quiz-app.spec.js"></script>
+  <script>
+    mocha.run();
+  </script>
+</body>
+</html>
