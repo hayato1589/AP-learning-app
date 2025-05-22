@@ -5,50 +5,87 @@
   <title>QuizApp Mocha Test</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha/mocha.css" />
   <style>
-    body { font-family: sans-serif; }
-    #mocha { margin: 2em; }
+    body { font-family: sans-serif; background: #f7f7f7; }
+    #mocha { margin: 2em auto; max-width: 900px; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+    .test-guide { max-width: 900px; margin: 2em auto 0; background: #e3f2fd; padding: 1em 2em; border-radius: 8px; color: #1565c0; }
+    .hidden, .test-dummy-area { display: none !important; }
+    .test-btns { text-align: right; max-width: 900px; margin: 0 auto 1em; }
+    .test-btns button { margin-left: 1em; }
   </style>
 </head>
 <body>
+  <div class="test-guide">
+    <h2>QuizApp 自動テストページ</h2>
+    <p>このページはQuizAppの自動テスト用です。下の「テストを再実行」ボタンでいつでもテストを再実行できます。</p>
+    <ul>
+      <li>テスト結果は下の白いエリアに表示されます。</li>
+      <li>テスト用のダミーDOMは画面上には表示されません。</li>
+      <li>テストやコードを修正した場合はページをリロードしてください。</li>
+    </ul>
+  </div>
+  <div class="test-btns">
+    <button onclick="location.reload()">テストを再実行</button>
+  </div>
   <div id="mocha"></div>
+  <div id="test-running-indicator" style="text-align:center; color:#1976d2; font-weight:bold; margin:1em 0; display: none;">テスト実行中...</div>
+
+  <!-- ===== テスト用ダミーDOM（非表示） ===== -->
+  <div class="test-dummy-area">
+    <div id="favorite-count"></div>
+    <button id="favorite-quiz-button" class="hidden"></button>
+    <button id="favorite-list-button" class="hidden"></button>
+    <div id="temp-message" class="hidden"></div>
+    <div id="review-mode-badge" class="hidden"></div>
+    <div id="start-screen"></div>
+    <div id="quiz-container"></div>
+    <div id="total-questions"></div>
+    <div id="current-number"></div>
+    <div id="category"></div>
+    <div id="question-text"></div>
+    <div id="choices-container"></div>
+    <div id="result" class="hidden"></div>
+    <div id="judgment"></div>
+    <div id="explanation"></div>
+    <button id="next-button" class="hidden"></button>
+    <button id="prev-button" class="hidden"></button>
+    <button id="end-button"></button>
+    <button id="review-bookmarks-button" class="hidden"></button>
+    <button id="bookmark-button"></button>
+    <div id="quiz-end" class="hidden"></div>
+    <div id="quiz-end-title"></div>
+    <div id="quiz-end-message"></div>
+    <div id="worst-ranking-area"></div>
+    <div id="reminder-area"></div>
+    <div id="review-question"></div>
+    <div id="favorite-list-modal" class="hidden"></div>    <div id="favorite-list-container"></div>
+    <button id="close-favorite-list"></button>
+    <div id="timer">
+      <span id="timer-seconds">30</span>
+    </div>
+  </div>
+  <!-- ===== /テスト用ダミーDOM ===== -->
+
+  <!-- ===== テスト用スクリプト ===== -->
   <script src="https://cdn.jsdelivr.net/npm/mocha/mocha.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chai/chai.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chai@4.3.10/chai.js"></script>
   <script>mocha.setup('bdd');</script>
-  <!-- 必要なHTML要素のダミーを用意 -->
-  <div id="favorite-count"></div>
-  <button id="favorite-quiz-button" class="hidden"></button>
-  <button id="favorite-list-button" class="hidden"></button>
-  <div id="temp-message" class="hidden"></div>
-  <div id="review-mode-badge" class="hidden"></div>
-  <div id="start-screen"></div>
-  <div id="quiz-container"></div>
-  <div id="total-questions"></div>
-  <div id="current-number"></div>
-  <div id="category"></div>
-  <div id="question-text"></div>
-  <div id="choices-container"></div>
-  <div id="result" class="hidden"></div>
-  <div id="judgment"></div>
-  <div id="explanation"></div>
-  <button id="next-button" class="hidden"></button>
-  <button id="prev-button" class="hidden"></button>
-  <button id="end-button"></button>
-  <button id="review-bookmarks-button" class="hidden"></button>
-  <button id="bookmark-button"></button>
-  <div id="quiz-end" class="hidden"></div>
-  <div id="quiz-end-title"></div>
-  <div id="quiz-end-message"></div>
-  <div id="worst-ranking-area"></div>
-  <div id="reminder-area"></div>
-  <div id="favorite-list-modal" class="hidden"></div>
-  <div id="favorite-list-container"></div>
-  <button id="close-favorite-list"></button>
-  <div id="timer"></div>
-  <span id="timer-seconds"></span>
-  <script src="../quiz-app.js"></script>
-  <script src="quiz-app.spec.js"></script>
-  <script>
-    mocha.run();
+  <script type="module">
+    // QuizAppモジュールとテストを順序を保証して読み込む
+    import '../quiz-app.js';
+    import './quiz-app.spec.js';
+
+    // モジュール読み込み完了後にテストを実行
+    window.addEventListener('load', () => {
+      // テスト開始時に表示
+      document.getElementById('test-running-indicator').style.display = 'block';
+
+      // テスト実行
+      mocha.run(() => {
+        // テスト完了時に非表示
+        document.getElementById('test-running-indicator').style.display = 'none';
+      });
+    });
   </script>
+  <!-- ===== /テスト用スクリプト ===== -->
 </body>
 </html>
