@@ -6,11 +6,21 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha/mocha.css" />
   <style>
     body { font-family: sans-serif; background: #f7f7f7; }
-    #mocha { margin: 2em auto; max-width: 900px; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+    #mocha { margin: 2em auto; max-width: 900px; background: #f0f8ff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #ccc; color: #000; }
+    #mocha .test { background-color: #e8f5e9; margin-bottom: 8px; border-radius: 4px; color: #000; }
+    #mocha .test.pass { border-left: 5px solid #4caf50; }
+    #mocha .test.fail { border-left: 5px solid #f44336; background-color: #ffebee; }
+    #mocha .test h2 { padding: 10px 15px; margin: 0; font-size: 16px; color: #000; }
+    #mocha-stats { background-color: #e0f7fa; border-radius: 4px; padding: 8px; margin-bottom: 15px; color: #000; }
+    #mocha .suite h1 { color: #000; }
+    #mocha .test pre { color: #333; }
+    #mocha .test code { color: #333; }
+    
     .test-guide { max-width: 900px; margin: 2em auto 0; background: #e3f2fd; padding: 1em 2em; border-radius: 8px; color: #1565c0; }
     .hidden, .test-dummy-area { display: none !important; }
     .test-btns { text-align: right; max-width: 900px; margin: 0 auto 1em; }
-    .test-btns button { margin-left: 1em; }
+    .test-btns button { margin-left: 1em; padding: 8px 16px; background-color: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .test-btns button:hover { background-color: #1565c0; }
   </style>
 </head>
 <body>
