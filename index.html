@@ -19,12 +19,12 @@
         <!-- ▼追加：弱点克服・正答率ランキング・リマインダー通知エリア-->
         <div id="reminder-area" class="hidden" style="margin-bottom:1em;color:#e74c3c;font-weight:bold;"></div>
         <div class="main-button-group">
-            <button id="start-button" class="main-button">開始</button>
-            <button id="review-bookmarks-button" class="main-button hidden">ブックマーク復習</button>
-            <button id="favorite-quiz-button" class="main-button hidden">お気に入りから出題</button>
-            <button id="favorite-list-button" class="main-button hidden">お気に入り一覧</button>
-            <button id="mistake-quiz-button" class="main-button">弱点克服モード</button>
-            <button id="worst-ranking-button" class="main-button">正答率ワースト10</button>
+            <button id="start-button" class="main-button" aria-label="演習を開始">開始</button>
+            <button id="review-bookmarks-button" class="main-button hidden" aria-label="ブックマーク復習を開始">ブックマーク復習</button>
+            <button id="favorite-quiz-button" class="main-button hidden" aria-label="お気に入りから出題を開始">お気に入りから出題</button>
+            <button id="favorite-list-button" class="main-button hidden" aria-label="お気に入り一覧を表示">お気に入り一覧</button>
+            <button id="mistake-quiz-button" class="main-button" aria-label="弱点克服モードを開始">弱点克服モード</button>
+            <button id="worst-ranking-button" class="main-button" aria-label="正答率ワースト10を表示">正答率ワースト10</button>
         </div>
         <div id="worst-ranking-area" class="hidden" style="margin:1.5em 0;"></div>
         <!-- ▲追加ここまで -->
@@ -35,7 +35,7 @@
         <div class="modal-content">
             <h2 id="favorite-list-title">お気に入り一覧</h2>
             <div id="favorite-list-container"></div>
-            <button id="close-favorite-list">閉じる</button>
+            <button id="close-favorite-list" aria-label="お気に入り一覧を閉じる">閉じる</button>
         </div>
     </div>
 
@@ -48,13 +48,13 @@
                 <div class="header-content">
                     <h1>応用情報技術者試験 演習問題</h1>
                     <span id="review-mode-badge" class="review-mode-badge hidden">復習モード</span>
-                    <button id="end-button" class="end-button">テストを終了する</button>
+                    <button id="end-button" class="end-button" aria-label="テストを終了する">テストを終了する</button>
                 </div>
                 <div id="progress">問題 <span id="current-number">1</span> / <span id="total-questions">0</span></div>
                 <div id="timer" class="timer">残り <span id="timer-seconds">30</span> 秒</div>
             </header>
 
-            <button id="prev-button" class="hidden">戻る</button>
+            <button id="prev-button" class="hidden" aria-label="前の問題に戻る">戻る</button>
 
             <main id="question-container">
                 <div class="question-header">
@@ -64,8 +64,8 @@
                 <div class="question-content">
                     <p id="question-text"></p>
                     <div id="bookmark-buttons">
-                        <button id="favorite-button" title="お気に入り">★</button>
-                        <button id="bookmark-button" title="ブックマーク">🔖</button>
+                        <button id="favorite-button" title="お気に入り" aria-label="この問題をお気に入りに追加">★</button>
+                        <button id="bookmark-button" title="ブックマーク" aria-label="この問題をブックマーク">🔖</button>
                     </div>
                     <div id="choices-container" class="choices">
                         <!-- 選択肢がここに動的に追加されます -->
@@ -75,7 +75,7 @@
                         <h3 id="judgment"></h3>
                         <div id="explanation" class="explanation"></div>
                         <div class="next-button-container">
-                            <button id="next-button" class="hidden">次の問題へ</button>
+                            <button id="next-button" class="hidden" aria-label="次の問題へ進む">次の問題へ</button>
                         </div>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
         <p id="quiz-end-message">全ての問題が終了しました。</p>
         <p id="quiz-result" class="result-text"></p>
         <p id="pass-fail" class="result-text"></p>
-        <button onclick="resetQuiz()" class="reset-button">最初からやり直す</button>
+        <button onclick="resetQuiz()" class="reset-button" aria-label="最初からやり直す">最初からやり直す</button>
     </div>
     <script src="quiz-app.js"></script>
 </body>
