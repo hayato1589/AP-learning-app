@@ -1,6 +1,8 @@
 // quiz-app.js
 // Quizアプリ本体のクラス化
 class QuizApp {
+    static MISTAKE_HISTORY_KEY = 'mistakeHistory';
+    static QUESTION_STATS_KEY = 'questionStats';
     constructor() {
         // 状態変数の初期化。クイズの進行やユーザーの操作状態を管理するため。
         this.questions = [];
@@ -71,8 +73,6 @@ class QuizApp {
         this.bindMistakeQuizButton();
         // 正答率ワースト10表示ボタンのイベント登録
         this.bindWorstRankingButton();
-        // 自動復習リマインダー表示（必要な場合のみ）
-        this.showReviewRemindersIfNeeded();
    }
 
     // お気に入りID生成（問題文+カテゴリで一意化）
@@ -242,98 +242,115 @@ class QuizApp {
         // 問題切り替え時はタイマーをリセット
         this.clearTimer();
         const question = this.questions[idx];
-        // 問題番号・カテゴリ・本文を表示
-        document.getElementById('current-number').textContent = idx + 1;
-        document.getElementById('category').textContent = question.category;
-        document.getElementById('question-text').textContent = question.question;
+        // 問題番号・カテゴリ・本文を表示（要素が存在する場合のみ）
+        const currentNumber = document.getElementById('current-number');
+        if (currentNumber) currentNumber.textContent = idx + 1;
+        const category = document.getElementById('category');
+        if (category) category.textContent = question.category;
+        const questionText = document.getElementById('question-text');
+        if (questionText) questionText.textContent = question.question;
         // 復習モードバッジの表示切替
         const reviewBadge = document.getElementById('review-mode-badge');
-        if (this.isReviewBookmarksMode && reviewBadge) {
-            reviewBadge.classList.remove('hidden');
-        } else if (reviewBadge) {
-            reviewBadge.classList.add('hidden');
+        if (reviewBadge) {
+            if (this.isReviewBookmarksMode) {
+                reviewBadge.classList.remove('hidden');
+            } else {
+                reviewBadge.classList.add('hidden');
+            }
         }
         // お気に入り・ブックマークボタンの状態を更新
         const q = this.questions[idx];
         const qid = this.getQuestionId(q);
         const favIdx = this.favoriteQuestions.findIndex(fq => this.getQuestionId(fq) === qid);
         const favoriteButton = document.getElementById('favorite-button');
-        favoriteButton.classList.toggle('favorite-active', favIdx !== -1);
-        favoriteButton.setAttribute('aria-label', favIdx !== -1 ? 'お気に入りから削除' : 'お気に入りに追加');
-        favoriteButton.setAttribute('title', favIdx !== -1 ? 'お気に入りから削除' : 'お気に入りに追加');
-        document.getElementById('bookmark-button').classList.toggle('active', this.bookmarkedQuestions.includes(question));
+        if (favoriteButton) {
+            favoriteButton.classList.toggle('favorite-active', favIdx !== -1);
+            favoriteButton.setAttribute('aria-label', favIdx !== -1 ? 'お気に入りから削除' : 'お気に入りに追加');
+            favoriteButton.setAttribute('title', favIdx !== -1 ? 'お気に入りから削除' : 'お気に入りに追加');
+        }
+        const bookmarkButton = document.getElementById('bookmark-button');
+        if (bookmarkButton) {
+            bookmarkButton.classList.toggle('active', this.bookmarkedQuestions.includes(question));
+        }
 
         // 選択肢の描画。前回の内容をクリアしてから新たに生成
         const choicesContainer = document.getElementById('choices-container');
-        choicesContainer.innerHTML = '';
-        const choicesSection = document.createElement('div');
-        choicesSection.className = 'choices-section';
-        question.choices.forEach((choice, index) => {
-            // 選択肢ごとにcheckboxとlabelを生成
-            const choiceContainer = document.createElement('div');
-            choiceContainer.className = 'choice-container';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `choice-${index}`;
-            checkbox.name = 'quiz-choice';
-            checkbox.className = 'choice-checkbox';
-            checkbox.value = index;
-            // チェック時に他の選択肢を外し、回答判定を呼ぶ
-            checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    document.querySelectorAll('.choice-checkbox').forEach(cb => {
-                        if (cb !== checkbox) cb.checked = false;
-                    });
-                    this.checkAnswer(index);
-                    // 正解・不正解の色付け
-                    const question = this.questions[this.currentQuestionIndex];
-                    document.querySelectorAll('.choice-checkbox').forEach((cb, idx) => {
-                        const label = document.querySelector(`label[for="choice-${idx}"]`);
-                        if (label) {
-                            if (idx === question.answer) {
-                                label.classList.add('correct-answer');
-                                label.style.backgroundColor = '#d4edda';
-                            } else if (cb.checked) {
-                                label.classList.add('incorrect-answer');
-                                label.style.backgroundColor = '#f8d7da';
+        if (choicesContainer) {
+            choicesContainer.innerHTML = '';
+            const choicesSection = document.createElement('div');
+            choicesSection.className = 'choices-section';
+            question.choices.forEach((choice, index) => {
+                // 選択肢ごとにcheckboxとlabelを生成
+                const choiceContainer = document.createElement('div');
+                choiceContainer.className = 'choice-container';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `choice-${index}`;
+                checkbox.name = 'quiz-choice';
+                checkbox.className = 'choice-checkbox';
+                checkbox.value = index;
+                // チェック時に他の選択肢を外し、回答判定を呼ぶ
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        document.querySelectorAll('.choice-checkbox').forEach(cb => {
+                            if (cb !== checkbox) cb.checked = false;
+                        });
+                        this.checkAnswer(index);
+                        // 正解・不正解の色付け
+                        const question = this.questions[this.currentQuestionIndex];
+                        document.querySelectorAll('.choice-checkbox').forEach((cb, idx) => {
+                            const label = document.querySelector(`label[for="choice-${idx}"]`);
+                            if (label) {
+                                if (idx === question.answer) {
+                                    label.classList.add('correct-answer');
+                                    label.style.backgroundColor = '#d4edda';
+                                } else if (cb.checked) {
+                                    label.classList.add('incorrect-answer');
+                                    label.style.backgroundColor = '#f8d7da';
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
+                });
+                // 選択肢テキストのlabel生成
+                const choiceText = document.createElement('label');
+                choiceText.htmlFor = `choice-${index}`;
+                choiceText.className = 'choice-text';
+                choiceText.textContent = choice;
+                // labelクリック時にグレーアウト切替（選択肢の一時無効化）
+                choiceText.addEventListener('click', (event) => {
+                    const resultDiv = document.getElementById('result');
+                    if (resultDiv && !resultDiv.classList.contains('hidden')) {
+                        return;
+                    }
+                    event.preventDefault();
+                    if (choiceText.classList.contains('grayed-out')) {
+                        choiceText.classList.remove('grayed-out');
+                        checkbox.disabled = false;
+                    } else {
+                        choiceText.classList.add('grayed-out');
+                        checkbox.disabled = true;
+                    }
+                });
+                choiceContainer.appendChild(checkbox);
+                choiceContainer.appendChild(choiceText);
+                choicesSection.appendChild(choiceContainer);
             });
-            // 選択肢テキストのlabel生成
-            const choiceText = document.createElement('label');
-            choiceText.htmlFor = `choice-${index}`;
-            choiceText.className = 'choice-text';
-            choiceText.textContent = choice;
-            // labelクリック時にグレーアウト切替（選択肢の一時無効化）
-            choiceText.addEventListener('click', (event) => {
-                if (!document.getElementById('result').classList.contains('hidden')) {
-                    return;
-                }
-                event.preventDefault();
-                if (choiceText.classList.contains('grayed-out')) {
-                    choiceText.classList.remove('grayed-out');
-                    checkbox.disabled = false;
-                } else {
-                    choiceText.classList.add('grayed-out');
-                    checkbox.disabled = true;
-                }
-            });
-            choiceContainer.appendChild(checkbox);
-            choiceContainer.appendChild(choiceText);
-            choicesSection.appendChild(choiceContainer);
-        });
-        choicesContainer.appendChild(choicesSection);
+            choicesContainer.appendChild(choicesSection);
+        }
         // 結果表示・次へボタンを非表示にリセット
-        document.getElementById('result').classList.add('hidden');
-        document.getElementById('next-button').classList.add('hidden');
+        const resultDiv = document.getElementById('result');
+        if (resultDiv) resultDiv.classList.add('hidden');
+        const nextButton = document.getElementById('next-button');
+        if (nextButton) nextButton.classList.add('hidden');
         // 前へボタンの表示切替
         const prevButton = document.getElementById('prev-button');
-        if (idx > 0) {
-            prevButton.classList.remove('hidden');
-        } else {
-            prevButton.classList.add('hidden');
+        if (prevButton) {
+            if (idx > 0) {
+                prevButton.classList.remove('hidden');
+            } else {
+                prevButton.classList.add('hidden');
+            }
         }
         // 問題ごとのタイマー開始
         this.startTimer();
@@ -669,34 +686,7 @@ class QuizApp {
         }
     }
 
-    /**
-     * 自動復習リマインダーを必要に応じて表示する。
-     * 副作用: DOM操作、fetch。
-     */
-    showReviewRemindersIfNeeded() {
-        // リマインダー情報を取得し、1日以上経過したものだけ表示
-        const reminders = this.loadReviewReminders();
-        if (!reminders.length) return;
-        fetch('./data/questions.json')
-            .then(res => res.json())
-            .then(data => {
-                const now = Date.now();
-                const oneDay = 24 * 60 * 60 * 1000;
-                // 1日以上経過したリマインダーのみ抽出
-                const due = reminders.filter(r => {
-                    const elapsed = now - r.date;
-                    return elapsed > oneDay;
-                });
-                if (!due.length) return;
-                // 対象問題を抽出
-                const dueQuestions = data.filter(q => due.some(r => this.getQuestionId(q) === r.qid));
-                if (!dueQuestions.length) return;
-                // UIにリスト表示
-                const area = document.getElementById('reminder-area');
-                area.innerHTML = `復習推奨：<ul>${dueQuestions.map(q => `<li>${q.category}：${q.question}</li>`).join('')}</ul>`;
-                area.classList.remove('hidden');
-            });
-    }
+
 
     /**
      * 履歴（間違えた問題ID）をローカルストレージに保存する。
@@ -732,33 +722,16 @@ class QuizApp {
         // JSON文字列をオブジェクトに復元
         return JSON.parse(localStorage.getItem(QuizApp.QUESTION_STATS_KEY) || '{}');
     }
-    /**
-     * リマインダーをローカルストレージに保存する。
-     * @param {Object[]} reminders - リマインダー情報
-     * 副作用: localStorageの書き換え。
-     */
-    saveReviewReminders(reminders) {
-        // 配列をJSON文字列化して保存
-        localStorage.setItem(QuizApp.REVIEW_REMINDER_KEY, JSON.stringify(reminders));
-    }
-    /**
-     * リマインダーをローカルストレージから取得する。
-     * @returns {Object[]} リマインダー情報
-     */
-    loadReviewReminders() {
-        // JSON文字列を配列に復元
-        return JSON.parse(localStorage.getItem(QuizApp.REVIEW_REMINDER_KEY) || '[]');
-    }
+
 
     /**
      * クイズ終了時に間違えた問題IDを保存し、統計・リマインダーも更新する。
      * 副作用: localStorageの書き換え。
      */
     saveQuizResults() {
-        // 間違えた問題IDリスト、統計、リマインダーをまとめて更新
+        // 間違えた問題IDリスト、統計をまとめて更新
         const mistakeIds = [];
         const stats = this.loadQuestionStats();
-        const reminders = this.loadReviewReminders();
         this.questions.forEach((q, i) => {
             const qid = this.getQuestionId(q);
             const isCorrect = this.userAnswers[i] === q.answer;
@@ -766,14 +739,9 @@ class QuizApp {
             if (!stats[qid]) stats[qid] = { correct: 0, wrong: 0 };
             if (isCorrect) stats[qid].correct++;
             else stats[qid].wrong++;
-            if (!isCorrect) {
-                // 間違えた問題はリマインダーにも追加
-                reminders.push({ qid, date: Date.now() });
-            }
         });
         this.saveMistakeHistory(mistakeIds);
         this.saveQuestionStats(stats);
-        this.saveReviewReminders(reminders);
     }
 
     /**
