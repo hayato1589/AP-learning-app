@@ -1,0 +1,18 @@
+
+<!-- filepath: c:\tool\exercise-website\AP-learning-app\.gitignore\Issue\security-localstorage-risk.md -->
+# セキュリティ: localStorage利用による情報漏洩リスク
+
+## 概要
+お気に入りや履歴情報をlocalStorageに平文で保存しているため、端末を共有する場合やXSS攻撃時に情報漏洩のリスクがある。
+
+## 詳細
+- `quiz-app.js`でお気に入り・履歴・統計情報をlocalStorageに保存。
+- 悪意あるスクリプトが実行された場合、情報が容易に取得される。
+
+## 該当箇所
+- `quiz-app.js`（localStorageの利用箇所）
+
+## 改善案
+- localStorageの利用範囲を最小限に。
+- XSS対策（入力値のサニタイズ、CSPの導入）。
+- センシティブな情報は保存しない、または暗号化を検討。
